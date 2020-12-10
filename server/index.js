@@ -26,7 +26,9 @@ app.get('/api/tweets', (req, res) => {
 		if (data.coordinates) {
 			const coordinates = { lat: data.coordinates.coordinates[0], lng: data.coordinates.coordinates[1] }
 			if (STREAMING) {
-				res.write(JSON.stringify(coordinates))
+				const coordinateStr = JSON.stringify(coordinates)
+				console.log("COORDINATES", coordinateStr)
+				res.write(coordinateStr)
 			} else {
 				res.end()
 			}

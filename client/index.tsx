@@ -3,21 +3,23 @@ import { useEffect, useState } from 'react'
 import * as ReactDOM from 'react-dom'
 import "regenerator-runtime/runtime"
 import { Map } from './components/Map'
-import { TimeSlider } from './components/TimeSlider'
 import { startStream, stopStream, readFromStream } from './api/tweetsAPI'
+import { Slider }  from '@material-ui/core'
 
 type Markers = {
     lat: string,
     lng: string
 }
+
 const App = () => {
     const [ markers, setMarkers ] = useState<Markers[]>([])
-
+    const [ sliderValue, setSliderValue ] = useState<number|null>(markers.length)
     const onStartStream = async() => {
         const stream = await startStream('/api/tweets')
-        const streamValue = await readFromStream(stream?.body)
-        const parsedValue = JSON.parse(streamValue)
-        setMarkers([...markers, parsedValue])
+        await readFromStream(stream?.body, (streamValue) => {
+            const parsedValue = JSON.parse(streamValue)
+            setMarkers(markers => [...markers, parsedValue])
+        })
     }
 
     useEffect(() => {
@@ -27,12 +29,18 @@ const App = () => {
         streamOnMount()
     }, [])
 
+    const onChangeSlider = (event: object, value: number|number[]) : void => {
+        if (typeof value === 'number') {
+            setSliderValue(value)
+        }
+    }
+
     return (
         <div>
             <div>
                 <button onClick={() => stopStream()}>Pause</button>
-                <button onClick={async() => await onStartStream()}>Resume</button>
-                <Slider />
+                <button onClick={() => onStartStream()}>Resume</button>
+                <Slider min={0} max={markers.length} value={sliderValue} onChange={(event, value) => onChangeSlider(event, value)} marks={true}/>
             </div>
             <Map markers={markers}/>
         </div>

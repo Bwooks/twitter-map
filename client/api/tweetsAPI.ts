@@ -18,7 +18,7 @@ export const startStream = async(url: string) => {
     }
 }
 
-export const readFromStream = async(stream: ReadableStream): Promise<string> => {
+export const readFromStream = async(stream: ReadableStream, callback: Function): Promise<string> => {
     if (!stream) return null
 
     const streamReader = stream.getReader()
@@ -28,7 +28,7 @@ export const readFromStream = async(stream: ReadableStream): Promise<string> => 
         chunk = await streamReader.read()
         const decodedValue = decoder.decode(chunk.value)
         try {
-            return decodedValue
+            callback(decodedValue)
         } catch(error) {
             console.error(`Error: ${error}`)
         }
