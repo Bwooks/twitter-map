@@ -21,11 +21,10 @@ app.get('/', (req, res) => {
 app.get('/api/tweets', (req, res) => {
 
 	const stream = client.stream('statuses/filter', { 'locations':'-180,-90,180,90' })
+	STREAMING = true
 	stream.on('data', (data) => {
-		STREAMING = true
 		if (data.coordinates) {
 			const coordinates = { lat: data.coordinates.coordinates[0], lng: data.coordinates.coordinates[1] }
-			console.log("coords", coordinates)
 			if (STREAMING) {
 				res.write(JSON.stringify(coordinates))
 			} else {
@@ -39,8 +38,9 @@ app.get('/api/tweets', (req, res) => {
 	})
 })
 
-app.get('/api/tweets/cancel', () => {
+app.post('/api/tweets/stop', (req, res) => {
 	STREAMING = false
+	res.sendStatus(200)
 })
 
 app.listen(port, (req, res) => {

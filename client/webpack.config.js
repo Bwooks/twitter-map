@@ -1,13 +1,20 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
+const dotenv = require('dotenv-webpack')
+
 module.exports = {
-    entry: './index.js',
+    entry: './index.tsx',
     watch: true,
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js']
+    },
+    devtool: 'source-map',
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(ts|js)x?$/,
                 exclude: /node_modules/,
+                include: /client/,
                 use: {
                     loader: "babel-loader"
                 }
@@ -26,6 +33,10 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './index.html',
             filename: './index.html'
+        }),
+        new dotenv({
+            path: path.resolve(__dirname, '../.env'),
+            safe: true
         })
     ]
 };
