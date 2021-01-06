@@ -8,6 +8,7 @@ Mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN
 export const Map = ({ markers }) => {
     const [ map, setMap ] = useState(null)
     const mapContainer = useRef(null)
+    const [ mappedMarkers, setMappedMarkers ] = useState({})
 
     useEffect(() => {
         const Map = new Mapboxgl.Map({
@@ -20,13 +21,26 @@ export const Map = ({ markers }) => {
     }, [])
 
     useEffect(() => {
+        markers.forEach((marker) => {
+            const mappedMarker = mappedMarkers[marker.id]
+            if (mappedMarker && mappedMarker.visible !== marker.visible) {
+                mappedMarker._element.style.visibility = marker.visible ? 'visible' : 'hidden'
+                mappedMarker.visible = marker.visible
+            }
+        })
+    }, [markers])
+
+
+    useEffect(() => {
         if (markers.length) {
             const marker = markers[markers.length - 1]
-            new Mapboxgl.Marker()
+            const mappedMarker = new Mapboxgl.Marker()
                 .setLngLat([marker.lat, marker.lng])
                 .addTo(map)
+            mappedMarker._element.id = marker.id
+            setMappedMarkers(mappedMarkers => ({ ...mappedMarkers, [marker.id]: { ...mappedMarker, visible: marker.visible }}))
         }
-    }, [markers])
+    }, [markers.length])
     return (
         <div id={MAP_CONTAINER_EL_ID} ref={(el) => mapContainer.current = el } style={{ height: "100vh" }} />
     )

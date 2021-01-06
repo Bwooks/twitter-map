@@ -6,7 +6,7 @@
   "author": "bwooks",
   "license": "MIT",
   "scripts": {
-    "build": "cd client && webpack --mode production"
+    "build": "cd client && webpack --mode development"
   },
   "dependencies": {
     "@babel/preset-env": "^7.12.1",
@@ -23,6 +23,7 @@
     "html-loader": "^1.3.2",
     "html-webpack-plugin": "^4.5.0",
     "mapbox-gl": "^1.12.0",
+    "nanoid": "^3.1.20",
     "node-twitter": "^0.5.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

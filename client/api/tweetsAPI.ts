@@ -8,17 +8,20 @@ export const stopStream = async() => {
     }
 }
 
-export const startStream = async(url: string) => {
+export const startStream = async(callback: Function) => {
     try{
-        return await fetch(url, {
+        const response = await fetch('/api/tweets', {
             method :'GET'
         })
+        const stream = response.body
+
+        return readFromStream(stream, callback)
     } catch (error) {
         console.log(`Error: ${error}`)
     }
 }
 
-export const readFromStream = async(stream: ReadableStream, callback: Function): Promise<string> => {
+const readFromStream = async(stream: ReadableStream, callback: Function): Promise<string> => {
     if (!stream) return null
 
     const streamReader = stream.getReader()
