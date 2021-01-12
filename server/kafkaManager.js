@@ -1,53 +1,58 @@
-import { kafkaClient as Client, Producer, Consumer } from 'kafka-node'
+import kafka from 'kafka-node'
+const { KafkaClient: Client, Producer, Consumer } = kafka
 import dotenv from 'dotenv'
 
 dotenv.config()
+const { KAFKA_HOST, KAFKA_PRODUCER_TOPIC, KAFKA_CONSUMER_TOPIC } = process.env
 
 class KafkaManager {
     constructor(kafkaHost) {
-        this.client = new Client({ kafkaHost: kafkaHost || process.env.KAFKA_HOST })
-        this.producer = new Producer(this.client)
-        this.consumer = new Consumer(this.client, [{ topic: process.env.KAFKA_CONSUMER_TOPIC }])
+        this.client = new Client({ kafkaHost: kafkaHost || KAFKA_HOST })
+        this.producer = null
+        this.consumer = null
     }
 
-    publish({ topic, messages }, callback) {
-        const { producer } = this
+    publish({ topic, messages, partition }, callback) {
+        if (!messages) return
 
         const payload = {
-            topic,
+            topic: topic || KAFKA_PRODUCER_TOPIC,
+            partition: partition || 0,
             messages
         }
 
-        producer.on('ready', () => {
-            producer.send(payload, (err, data) => {
+        if (!this.producer) {
+            this.producer = new Producer(this.client)
+        } else if (this.producer.ready) {
+            this.producer.send([payload], (err, data) => {
                 console.log(`Published to topic ${topic}`)
                 callback && callback(err, data)
             })
-        })
+
+            this.producer.on('error', (error) => {
+                console.log(`Error: ${error}`)
+            })
+        }
     }
 
     read({ topic, partition }, callback) {
-        this.consumer.addTopics([{ topic, partition }])
 
-        this.consumer.on('message', async(message) => {
-            callback && callback(message, null)
-        })
-
-        this.consumer.on('error', (error) => {
-            callback && callback(null, error)
-        })
-    }
-
-    createTopic({ topic, partitions = 1 }, callback) {
-        const topicToCreate = {
-            topic,
-            partitions
+        const options = {
+            topic: topic || KAFKA_CONSUMER_TOPIC,
+            partition: partition || 0
         }
 
-        this.client.createTopics([topicToCreate], (error, result) => {
-            console.log(`Topic ${topic} created successfully`, result)
-            callback && callback(error, result)
-        })
+        if (!this.consumer) {
+            this.consumer = new Consumer(this.client, [options])
+        } else {
+            this.consumer.on('message', (message) => {
+                callback && callback(message, null)
+            })
+
+            this.consumer.on('error', (error) => {
+                callback && callback(null, error)
+            })
+        }
     }
 }
 
