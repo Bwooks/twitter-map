@@ -1,3 +1,0 @@
-[2021-01-10 09:18:33,005] INFO Expiring session 0x10095c23877000c, timeout of 18000ms exceeded (org.apache.zookeeper.server.ZooKeeperServer)
-[2021-01-10 09:18:33,049] WARN Unable to read additional data from client sessionid 0x10095c23877000c, likely client has closed socket (org.apache.zookeeper.server.NIOServerCnxn)
-[2021-01-10 09:18:35,338] INFO Invalid session 0x10095c23877000c for client /127.0.0.1:50358, probably expired (org.apache.zookeeper.server.ZooKeeperServer)

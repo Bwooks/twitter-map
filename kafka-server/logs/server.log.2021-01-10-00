@@ -1,2 +1,0 @@
-[2021-01-10 02:14:47,004] INFO Expiring session 0x10095c238770007, timeout of 18000ms exceeded (org.apache.zookeeper.server.ZooKeeperServer)
-[2021-01-10 02:14:49,387] INFO Invalid session 0x10095c238770007 for client /127.0.0.1:50053, probably expired (org.apache.zookeeper.server.ZooKeeperServer)
