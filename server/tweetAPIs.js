@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import KafkaManager from './kafkaManager'
+import KafkaManager from './kafkaManager.js'
 // TODO: Get websockets working and stream data from kafka topic to frontend
 const routes = Router()
 

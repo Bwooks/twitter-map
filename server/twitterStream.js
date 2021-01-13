@@ -1,5 +1,5 @@
 import twitter from 'twitter'
-import kafkaManager from './kafkaManager'
+import kafkaManager from './kafkaManager.js'
 
 const client = new twitter({
     consumer_key: process.env.CONSUMER_KEY,

@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import path from 'path'
 import tweetAPIs from './tweetAPIs.js'
-import startStreamingTweets from './twitterStream'
+import startStreamingTweets from './twitterStream.js'
 
 const app = express()
 const port = process.env.PORT || 3000
