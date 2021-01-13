@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "name": "twitter-map",
   "version": "1.0.0",
   "description": "Global tweet map",
@@ -7,16 +6,15 @@
   "author": "bwooks",
   "license": "MIT",
   "scripts": {
-    "build": "cd  && webpack --mode development"
+    "build": "webpack --mode development --config webpack.config.js"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.2",
-    "dotenv": "^8.2.0",
     "dotenv-webpack": "^6.0.0",
     "mapbox-gl": "^1.12.0",
     "nanoid": "^3.1.20",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "react-dom": "^17.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
