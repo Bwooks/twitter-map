@@ -6,6 +6,10 @@ dotenv.config()
 const { KAFKA_HOST, KAFKA_PRODUCER_TOPIC, KAFKA_CONSUMER_TOPIC } = process.env
 
 class KafkaManager {
+    private consumer: any
+    private producer: any
+    private readonly client: any
+
     constructor(kafkaHost) {
         this.client = new Client({ kafkaHost: kafkaHost || KAFKA_HOST })
         this.producer = null
@@ -23,8 +27,8 @@ class KafkaManager {
 
         if (!this.producer) {
             this.producer = new Producer(this.client)
-        } else if (this.producer.ready) {
-            this.producer.send([payload], (err, data) => {
+        } else {
+            this.producer.ready && this.producer.send([payload], (err, data) => {
                 console.log(`Published to topic ${topic}`)
                 callback && callback(err, data)
             })
@@ -35,7 +39,7 @@ class KafkaManager {
         }
     }
 
-    read({ topic, partition }, callback) {
+    read({ topic, partition }: { topic: string | undefined, partition: number | undefined}, callback) {
 
         const options = {
             topic: topic || KAFKA_CONSUMER_TOPIC,
@@ -43,7 +47,7 @@ class KafkaManager {
         }
 
         if (!this.consumer) {
-            this.consumer = new Consumer(this.client, [options])
+            this.consumer = new Consumer(this.client, [options], null)
         } else {
             this.consumer.on('message', (message) => {
                 callback && callback(message, null)
