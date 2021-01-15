@@ -6,6 +6,7 @@ dotenv.config()
 const { KAFKA_HOST, KAFKA_PRODUCER_TOPIC, KAFKA_CONSUMER_TOPIC } = process.env
 
 class KafkaManager {
+
     private consumer: any
     private producer: any
     private readonly client: any

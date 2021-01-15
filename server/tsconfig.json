@@ -1,6 +1,6 @@
 {
   "include": [
-    "server/**/*ts"
+    "**/*ts"
   ],
   "exclude": [
     "node_modules"
@@ -11,7 +11,8 @@
     "target": "esnext",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "skipLibCheck": true
   },
   "lib": ["es2015"]
 }
