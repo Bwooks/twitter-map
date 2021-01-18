@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000
 const __dirname = import.meta.url
 
 dotenv.config()
-
+console.log("WOOO")
 app.use(express.static(path.join(__dirname, '..', 'client', 'dist')))
 app.use('/', tweetAPIs)
 

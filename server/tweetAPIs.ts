@@ -1,10 +1,21 @@
 import { Router } from 'express'
 import KafkaManager from './kafkaManager.js'
-// TODO: Get websockets working and stream data from kafka topic to frontend
 const routes = Router()
+const { KAFKA_HOST } = process.env
+const kafkaManager = new KafkaManager({ kafkaHost: KAFKA_HOST })
 
-routes.get('/api/stream', () => {
-
+routes.get('/api/tweets', (req, res) => {
+    try {
+        kafkaManager.read((err, message) => {
+            if (err) {
+                console.log(`Error reading from kafka ${err}`)
+            } else {
+                console.log("MESSAGE FROM KAFKA", message)
+            }
+        })
+    } catch (readError) {
+        console.log(`Error reading from kafka topic ${readError}`)
+    }
 })
 
 routes.post('/api/tweets/stop', (req, res) => {

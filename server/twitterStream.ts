@@ -1,7 +1,9 @@
 import twitter from 'twitter'
-import kafkaManager from './kafkaManager.js'
+import KafkaManager from './kafkaManager.js'
 
-const { CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET } = process.env
+const { CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET, KAFKA_HOST } = process.env
+
+const kafkaManager = new KafkaManager({ kafkaHost: KAFKA_HOST })
 
 const client = new twitter({
     consumer_key: CONSUMER_KEY,
@@ -16,7 +18,9 @@ const startStreamingTweets = () => {
     const stream = client.stream('statuses/filter', COORDINATES_FOR_GLOBE)
 
     stream.on('data', (data) => {
-        kafkaManager.publish({ messages: JSON.stringify(data) })
+        kafkaManager.publish(JSON.stringify(data), (err, data) => {
+
+        })
     })
 
     stream.on('error', (error) => {
