@@ -16,11 +16,12 @@ type Marker = {
 
 const App = () => {
     const [ markers, setMarkers ] = useState<Marker[]>([])
-    const [ sliderValue, setSliderValue ] = useState<number|null>(markers.length)
+    const [ sliderValue, setSliderValue ] = useState<number| number[] | null>(markers.length)
 
     const onStartStream = async() => {
         await startStream((chunk) => {
-            const marker = JSON.parse(chunk)
+            const tweet = JSON.parse(chunk)
+            const marker = { lat: tweet.coordinates.lat, lng: tweet.coordinates.lng }
             setMarkers(markers => [...markers, { ...marker, visible: true, id: `id-${nanoid()}` }])
         })
     }

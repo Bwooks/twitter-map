@@ -10,7 +10,7 @@ export const stopStream = async() => {
 
 export const startStream = async(callback: Function) => {
     try{
-        const response = await fetch('/api/tweets', {
+        const response = await fetch('http://localhost:3000/api/tweets/stream', {
             method :'GET'
         })
         const stream = response.body

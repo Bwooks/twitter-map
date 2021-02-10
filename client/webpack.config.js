@@ -4,7 +4,7 @@ const dotenv = require('dotenv-webpack')
 
 module.exports = {
     entry: './index.tsx',
-    watch: true,
+    watch: false,
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
     },

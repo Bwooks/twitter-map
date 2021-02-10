@@ -8,7 +8,6 @@ const { KAFKA_HOST, KAFKA_MAIN_TOPIC } = process.env
 type kafkaManagerOptionsType = {
     topic?: string,
     partition?: number,
-    offset?: number,
     kafkaHost: string
 }
 
@@ -20,20 +19,35 @@ class KafkaManager {
     private readonly partition: number
     private readonly client: any
 
-    constructor({ kafkaHost, topic, partition, offset }: kafkaManagerOptionsType) {
+    constructor({ kafkaHost, topic, partition }: kafkaManagerOptionsType) {
         this.topic = topic || KAFKA_MAIN_TOPIC
         this.partition = partition || 0
-        const consumerOptions = {
-            topic: this.topic,
-            partition: this.partition,
-            ...(typeof offset === 'number' ? { offset } : {})
-        }
         this.client = new Client({ kafkaHost: kafkaHost || KAFKA_HOST })
-        this.producer = new Producer(this.client)
-        this.consumer = new Consumer(this.client, [consumerOptions], null)
+        this.producer = this.createProducer(this.client)
+        this.consumer = this.createConsumer({topic: this.topic, partition: this.partition})
     }
 
-    publish(messages: string | Array<string>, callback): void {
+    private createProducer(client) {
+        const producer = new Producer(client)
+
+        producer.on('error', (error) => {
+            console.log(`Error creating producer ${error}`)
+        })
+
+        return producer
+    }
+
+    private createConsumer({topic, partition}) {
+        const consumer = new Consumer(this.client, [{ topic, partition }], null)
+
+        consumer.on('error', (error) => {
+            console.log(`Error reading from topic ${topic}: ${error}`)
+        })
+
+        return consumer
+    }
+
+    public publish(messages: string | Array<string>, callback?): void {
         if (!messages) return
 
         const payload = {
@@ -44,7 +58,7 @@ class KafkaManager {
 
         if (this.producer && this.producer.ready) {
             this.producer.ready && this.producer.send([payload], (err, data) => {
-                //console.log(`Published to topic ${this.topic}`)
+                console.log(`Published to topic ${this.topic}`, data)
                 callback && callback(err, data)
             })
 
@@ -54,16 +68,12 @@ class KafkaManager {
         }
     }
 
-    read(callback) {
-        console.log("BEFORE READ CB")
+    public read(callback) {
+        console.log("BEFORE READ CB", this.consumer)
         this.consumer.on('message', (message) => {
+            console.log("MESSAGE", message)
             callback && callback(null, message)
         })
-
-        this.consumer.on('error', (error) => {
-            callback && callback(error, null)
-        })
-
     }
 }
 
