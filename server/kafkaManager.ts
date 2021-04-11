@@ -69,11 +69,21 @@ class KafkaManager {
     }
 
     public read(callback) {
-        console.log("BEFORE READ CB", this.consumer)
         this.consumer.on('message', (message) => {
-            console.log("MESSAGE", message)
             callback && callback(null, message)
         })
+    }
+
+    public pause(topic, callback) {
+        console.log("PAUSING")
+        this.consumer.pauseTopics(topic || KAFKA_MAIN_TOPIC)
+        callback()
+    }
+
+    public resume(topic, callback) {
+        console.log("RESUME")
+        this.consumer.resumeTopics(topic || KAFKA_MAIN_TOPIC)
+        callback()
     }
 }
 

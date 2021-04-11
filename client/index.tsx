@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { useEffect, useState } from 'react'
+import {BaseSyntheticEvent, useEffect, useState} from 'react'
 import * as ReactDOM from 'react-dom'
 import "regenerator-runtime/runtime"
 import { Map } from './components/Map'
-import { startStream, stopStream } from './api/tweetsAPI'
-import { Slider }  from '@material-ui/core'
-import { nanoid } from 'nanoid'
+import { startStream, pauseStream, resumeStream } from './api/tweetsAPI'
+import { queryText } from './api/searchAPI'
+import { Slider, TextField }  from '@material-ui/core'
 
 type Marker = {
-    id: string,
+    id: number,
     lat: string,
     lng: string,
     visible: boolean
@@ -17,12 +17,15 @@ type Marker = {
 const App = () => {
     const [ markers, setMarkers ] = useState<Marker[]>([])
     const [ sliderValue, setSliderValue ] = useState<number| number[] | null>(markers.length)
+    const [ searchHits, setSearchHits ] = useState<number[] | null>([])
 
     const onStartStream = async() => {
         await startStream((chunk) => {
             const tweet = JSON.parse(chunk)
-            const marker = { lat: tweet.coordinates.lat, lng: tweet.coordinates.lng }
-            setMarkers(markers => [...markers, { ...marker, visible: true, id: `id-${nanoid()}` }])
+            const { text, id, coordinates: { lat, lng } } = tweet
+            const marker = { text, lat, lng, id, visible: true }
+
+            setMarkers(markers => markers.concat(marker) )
         })
     }
 
@@ -30,9 +33,32 @@ const App = () => {
         setSliderValue(markers.length)
     }, [markers.length])
 
+    useEffect(() => {
+        if (!searchHits.length) {
+            setAllMarkersVisibility(true)
+            return
+        }
+
+        markers.forEach((marker) => {
+            const matchesMarker = searchHits.indexOf(marker.id)
+
+            if (matchesMarker >= 0) {
+                updateMarkerVisibility(marker, true)
+            } else {
+                updateMarkerVisibility(marker, false)
+            }
+        })
+    }, [searchHits])
+
     const updateMarkerVisibility = (marker: Marker, visible: boolean) => {
         marker.visible = visible
         return marker
+    }
+
+    const setAllMarkersVisibility = (visibility: boolean) => {
+        markers.forEach((marker) => {
+            updateMarkerVisibility(marker, visibility)
+        })
     }
 
     const onChangeSlider = (event: object, value: number|number[]) : void => {
@@ -59,6 +85,19 @@ const App = () => {
         updatedMarkers && setMarkers(updatedMarkers)
     }
 
+    const onChangeSearch = async(event: BaseSyntheticEvent): void => {
+        const inputText = event.target.value
+
+        if (!inputText) return
+
+        const result = await queryText(inputText)
+        const searchHits = result.data.hits.hits.map((hit) => {
+            return hit._source.id
+        })
+
+        setSearchHits(searchHits)
+    }
+
     useEffect(() => {
         const streamOnMount = async () => {
             await onStartStream()
@@ -69,11 +108,12 @@ const App = () => {
     return (
         <div>
             <div>
-                <button onClick={() => stopStream()}>Pause</button>
-                <button onClick={() => onStartStream()}>Resume</button>
+                <button onClick={() => pauseStream()}>Pause</button>
+                <button onClick={() => resumeStream()}>Resume</button>
                 <Slider min={0} max={markers.length} value={sliderValue} marks={true} onChange={(event, value) => onChangeSlider(event, value)}/>
+                <TextField fullWidth={true} onChange={onChangeSearch}/>
             </div>
-            <Map markers={markers}/>
+            <Map markers={markers} />
         </div>
     )
 }

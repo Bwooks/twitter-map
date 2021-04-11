@@ -23,6 +23,7 @@ export const Map = ({ markers }) => {
     useEffect(() => {
         markers.forEach((marker) => {
             const mappedMarker = mappedMarkers[marker.id]
+            console.log("MAPPED marker", mappedMarker)
             if (mappedMarker && mappedMarker.visible !== marker.visible) {
                 mappedMarker._element.style.visibility = marker.visible ? 'visible' : 'hidden'
                 mappedMarker.visible = marker.visible
@@ -36,9 +37,12 @@ export const Map = ({ markers }) => {
             const marker = markers[markers.length - 1]
             const mappedMarker = new Mapboxgl.Marker()
                 .setLngLat([marker.lat, marker.lng])
+                .setPopup(new Mapboxgl.Popup().setHTML(`${marker.text}`))
                 .addTo(map)
             mappedMarker._element.id = marker.id
-            setMappedMarkers(mappedMarkers => ({ ...mappedMarkers, [marker.id]: { ...mappedMarker, visible: marker.visible }}))
+            setMappedMarkers(mappedMarkers => (
+                { ...mappedMarkers, [marker.id]: { ...mappedMarker, visible: marker.visible }}
+            ))
         }
     }, [markers.length])
     return (

@@ -1,10 +1,20 @@
-export const stopStream = async() => {
-    try{
-        await fetch('/api/tweets/stop',{
+export const pauseStream = async() => {
+    try {
+        await fetch('/api/tweets/pause',{
             method :'POST',
         })
     } catch (error) {
         console.log(`Error: ${error}`)
+    }
+}
+
+export const resumeStream = async() => {
+    try {
+        await fetch('/api/tweets/resume', {
+            method: 'POST'
+        })
+    } catch (error) {
+        console.log(`Error:  ${error}"`)
     }
 }
 
